@@ -1,15 +1,13 @@
-from django.conf import settings  #settings
+from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.utils.decorators import method_decorator  #decorators
+from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DetailView, View
-
 
 from allauth.account.decorators import verified_email_required
 
+from product.models import Product, Order
 
-from product.models import Product, Orders
-# Create your views here.
 
 class ProductDetailView(DetailView):
     '''
@@ -108,7 +106,7 @@ class UpdateProduct(View):
 def purchased_view(request, pk):
     ''' purchased  '''
     print('ok')
-    order = Orders()
+    order = Order()
     order.product = Product.objects.get(id=pk)
     order.user = request.user
     order.price = order.product.price
