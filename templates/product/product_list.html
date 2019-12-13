@@ -1,0 +1,153 @@
+{% extends 'base.html'%}
+{%block content%}
+    <div class="container">
+      <h1 align="center">Product list</h1>
+      <table class="table table-striped" id="productTable">
+        <thead>
+          <tr >
+            <th>Name</th>
+            <th>Description</th>
+            <th>price</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for product in list_of_product %}
+        <tr class="product-{{product.id}}" >
+          <td class="productName productData" name="name"><h3><a href="/detail/{{product.id}}">{{product.product_name}}</a></h3></td>
+          <td class="productDescription productata" name="description" >{{product.description|truncatewords:30|linebreaks}}</td>
+          <td class="productPrice productData" name="price">{{product.price}}</td>
+          <td >  <img src="{{ product.image.url }}" style="height:100px"></td>
+            {% if request.user.role == "admin" %}
+            <td align="center">
+                <button class="btn btn-success form-control" onClick="editProduct({{product.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+            </td>
+              <td>
+                    <button class="btn btn-danger form-control" onClick="deleteUser({{product.id}})">DELETE</button>
+                </td>
+              {% endif %}
+        </tr>
+        {% if request.user.role == "customer" %}
+        <td>
+          <form  action="{% url 'purchased' pk=product.id %}" method="post">
+            {%csrf_token%}
+
+            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+              data-key="{{ key }}"
+              data-name="{{product.product_name}}"
+              data-amount="{{product.price}}"
+              data-currency="inr">
+            </script>
+
+        </form>
+        </td>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title" id="myModalLabel">Update</h4>
+      </div>
+      <form id="updateProduct" >
+          {% csrf_token %}
+          {{form}}
+              <button type="submit">SUBMIT</button>
+      </form>
+    </div>
+  </div>
+  <script
+          src="https://code.jquery.com/jquery-3.4.1.js"
+          integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+            crossorigin="anonymous"></script>
+
+
+      <script type="text/javascript">
+
+
+        function deleteUser(id)
+        {
+          var action = confirm("Are you sure you want to delete this user?");
+          if (action != false)
+          {
+            $.ajax(
+            {
+              url: {% url "delete_product" %},
+              data:
+              {
+                'id': id,
+              },
+              dataType: 'json',
+              success: function (data)
+              {
+                $(".product-" + id).remove();
+              }
+            }
+            );
+          }
+        }
+      </script>
+
+      <script type="text/javascript">
+
+        $("form#updateProduct").submit(function() {
+        var idInput = $('input[name="formId"]').val().trim();
+        var nameInput = $('input[name="formName"]').val().trim();
+        var descriptionInput = $('input[name="formDescription"]').val().trim();
+        var priceInput = $('input[name="formPrice"]').val().trim();
+        if (nameInput && descriptionInput && priceInput) {
+          // Create Ajax Call
+          $.ajax({
+              url: '{% url "update_product" %}',
+              data: {
+                  'id': idInput,
+                  'name': nameInput,
+                  'description': descriptionInput,
+                  'price': priceInput
+              },
+              dataType: 'json',
+              success: function (data) {
+                  if (data.product) {
+                    updateToProductTable(data.product);
+                  }
+              }
+          });
+         } else {
+          alert("All fields must have a valid value.");
+      }
+      $('form#updateProduct').trigger("reset");
+      $('#myModal').modal('hide');
+      return false;
+  });
+
+  // Update Django Ajax Call
+  function editProduct(id) {
+    if (id) {
+      tr_id = ".product-" + id;
+      name = $(tr_id).find(".productName").text();
+      description = $(tr_id).find(".productDescription").text();
+      price = $(tr_id).find(".productPrice").text();
+      $('#form-id').val(id);
+      $('#form-name').val(name);
+      $('#form-des').val(description);
+      $('#form-price').val(price);
+    }
+  }
+  function updateToProductTable(product){
+      $(".product-" + product.id).children(".productData").each(function() {
+          var attr = $(this).attr("name");
+          if (attr == "name") {
+            $(this).text(product.name);
+          } else if (attr == "description") {
+            $(this).text(product.description);
+          } else {
+            $(this).text(product.price);
+          }
+        });
+  }
+
+      </script>
+{% endblock%}

@@ -1,0 +1,10 @@
+{% extends 'base.html'%}
+{%block content%}
+    <h1>are you sure to delete product information:{{Product.product_name}}</h1>
+    <form  method="post">
+      {% csrf_token %}
+      <input type="submit" class="btn btn-lg btn-danger" value="delete record">
+      <a href="/temp3/{{book.id}}" class="btn btn-lg btn-success">Cancel</a>
+    </form>
+
+{% endblock%}

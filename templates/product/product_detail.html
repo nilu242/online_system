@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{%block content%}
+<br><br><br>
+<div class="contner" id="div1">
+<h1>{{product.product_name}}</h1><br>
+<h3>{{product.description}}</h3><br>
+<h2>{{product.price}}</h2><br>
+<img src="{{ product.image.url }}">
+
+{% endblock%}
