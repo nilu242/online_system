@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'online_system2.urls'
+ROOT_URLCONF = 'online_system.urls'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'online_system2.wsgi.application'
+WSGI_APPLICATION = 'online_system.wsgi.application'
 
 
 # Database
