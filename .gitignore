@@ -1,4 +1,4 @@
 .env
 .vscode
 __pycache__
-media
+/online_system2/media/product_images

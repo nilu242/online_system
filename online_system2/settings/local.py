@@ -8,7 +8,7 @@ static_dir = os.path.join(BASE_DIR, "static")
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=i(k-iig-e_7yagc2mf9nu6in3j6&c9s+ms@3jdiur311e9zk@'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -83,11 +83,11 @@ WSGI_APPLICATION = 'online_system2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'online_system2',
-        'USER': 'admin',
-        'PASSWORD': 'admin123',
-        'HOST': '127.0.0.1',
-        # 'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('USER'),
+        'PASSWORD': os.environ.get('PASSWORD'),
+        'HOST': os.environ.get('HOST'),
+        # 'PORT': os.environ.get('PORT'),
     }
 }
 
