@@ -1,12 +1,15 @@
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, ListView, DetailView, View
+from django.views.generic import CreateView, ListView, DetailView, View, UpdateView
 
 from allauth.account.decorators import verified_email_required
 
+from .forms import ProductUpdateForm
 from product.models import Product, Order
+
+import json
 
 
 class ProductDetailView(DetailView):
@@ -74,34 +77,18 @@ class ProductDelete(View):
         }
         return JsonResponse(data)
 
-class UpdateProduct(View):
-    '''
-    product update class
-    '''
-    def  get(self, request, *args, **kwargs):
-        product_id = request.GET.get('id', None)
-        name = request.GET.get('name', None)
-        description = request.GET.get('description', None)
-        price = request.GET.get('price', None)
-        form = ProductUpdateForm()
-        return render(request, 'product_list.html',{'form',form})
+class UpdateProduct(UpdateView):
+    """
+    Updating product through AJAX
+    """
 
-    def post(self, request, *args, **kwargs):
-        form = ProductUpdateForm(data=request.POST)
-        if form.is_valid():
-            
-            form = ProductUpdateForm()
-            return render(request, 'product_list.html.html', {'form': form})
-        return render(request, 'product_list.html.html', {'form': form})
+    model = Product
+    fields = ['product_name', 'description', 'price', 'image']
 
-        # data = {
-        #     'id' : product.id,
-        #     'name' : product.product_name,
-        #     'description' : product.description,
-        #     'price' : product.price
-        # }
-
-        return JsonResponse(data)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = str(self.get_form())
+        return JsonResponse({'form': form})
 
 def purchased_view(request, pk):
     ''' purchased  '''

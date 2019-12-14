@@ -54,8 +54,10 @@
       </div>
       <form id="updateProduct" >
           {% csrf_token %}
-          {{form}}
-              <button type="submit">SUBMIT</button>
+          <div id="updateProductContainer">
+
+          </div>
+          <button type="submit">SUBMIT</button>
       </form>
     </div>
   </div>
@@ -94,46 +96,31 @@
       <script type="text/javascript">
 
         $("form#updateProduct").submit(function() {
-        var idInput = $('input[name="formId"]').val().trim();
-        var nameInput = $('input[name="formName"]').val().trim();
-        var descriptionInput = $('input[name="formDescription"]').val().trim();
-        var priceInput = $('input[name="formPrice"]').val().trim();
-        if (nameInput && descriptionInput && priceInput) {
-          // Create Ajax Call
-          $.ajax({
-              url: '{% url "update_product" %}',
-              data: {
-                  'id': idInput,
-                  'name': nameInput,
-                  'description': descriptionInput,
-                  'price': priceInput
-              },
-              dataType: 'json',
-              success: function (data) {
-                  if (data.product) {
-                    updateToProductTable(data.product);
-                  }
-              }
-          });
-         } else {
-          alert("All fields must have a valid value.");
-      }
+          var idInput = $('input[name="formId"]').val().trim();
+          var nameInput = $('input[name="formName"]').val().trim();
+          var descriptionInput = $('input[name="formDescription"]').val().trim();
+          var priceInput = $('input[name="formPrice"]').val().trim();
+          if (nameInput && descriptionInput && priceInput) {
+            // Create Ajax Call
+          } else {
+            alert("All fields must have a valid value.");
+        }
       $('form#updateProduct').trigger("reset");
       $('#myModal').modal('hide');
       return false;
-  });
+   });
 
   // Update Django Ajax Call
   function editProduct(id) {
     if (id) {
-      tr_id = ".product-" + id;
-      name = $(tr_id).find(".productName").text();
-      description = $(tr_id).find(".productDescription").text();
-      price = $(tr_id).find(".productPrice").text();
-      $('#form-id').val(id);
-      $('#form-name').val(name);
-      $('#form-des').val(description);
-      $('#form-price').val(price);
+      $.ajax({
+        method: "get",
+        url: 'update/'+id,
+        success: function(data) {
+          htm = $.parseHTML(data.form);
+          $('#updateProductContainer').html(htm)
+        }
+      })
     }
   }
   function updateToProductTable(product){
