@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
@@ -89,6 +90,16 @@ class UpdateProduct(UpdateView):
         self.object = self.get_object()
         form = str(self.get_form())
         return JsonResponse({'form': form})
+
+    def post(self, request, *args, **kwargs):
+        pro = self.request.GET.get('product_name', None)
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """If the form is valid, save the associated model."""
+        self.object = form.save()
+        return JsonResponse({'data': 'success'})
+
 
 def purchased_view(request, pk):
     ''' purchased  '''

@@ -14,9 +14,9 @@
         <tbody>
       {% for product in list_of_product %}
         <tr class="product-{{product.id}}" >
-          <td class="productName productData" name="name"><h3><a href="/detail/{{product.id}}">{{product.product_name}}</a></h3></td>
-          <td class="productDescription productata" name="description" >{{product.description|truncatewords:30|linebreaks}}</td>
-          <td class="productPrice productData" name="price">{{product.price}}</td>
+          <td class="productName productData" name="name"><h3><a href="/detail/{{product.id}}" id="product-{{product.id}}-name">{{product.product_name}}</a></h3></td>
+          <td class="productDescription productata" name="description" id="product-{{product.id}}-description" >{{product.description|truncatewords:30|linebreaks}}</td>
+          <td class="productPrice productData" name="price" id="product-{{product.id}}-price">{{product.price}}</td>
           <td >  <img src="{{ product.image.url }}" style="height:100px"></td>
             {% if request.user.role == "admin" %}
             <td align="center">
@@ -52,8 +52,9 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title" id="myModalLabel">Update</h4>
       </div>
-      <form id="updateProduct" >
+      <form id="updateProduct" method="post" >
           {% csrf_token %}
+          <input type="hidden" name="id" value="">
           <div id="updateProductContainer">
 
           </div>
@@ -61,12 +62,6 @@
       </form>
     </div>
   </div>
-  <script
-          src="https://code.jquery.com/jquery-3.4.1.js"
-          integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-            crossorigin="anonymous"></script>
-
-
       <script type="text/javascript">
 
 
@@ -96,12 +91,30 @@
       <script type="text/javascript">
 
         $("form#updateProduct").submit(function() {
-          var idInput = $('input[name="formId"]').val().trim();
-          var nameInput = $('input[name="formName"]').val().trim();
-          var descriptionInput = $('input[name="formDescription"]').val().trim();
-          var priceInput = $('input[name="formPrice"]').val().trim();
+          var csrfInput = $('input[name="csrfmiddlewaretoken"]').val();
+          var idInput = $('input[name="id"]').val().trim();
+          var nameInput = $('input[name="product_name"]').val().trim();
+          var descriptionInput = $('textarea[name="description"]').val().trim();
+          var priceInput = $('input[name="price"]').val().trim();
           if (nameInput && descriptionInput && priceInput) {
             // Create Ajax Call
+            $.ajax({
+            headers: { "X-CSRFToken": csrfInput },
+            url: 'update/'+idInput+'/',
+            type: "post",
+            data: {
+                'id': idInput,
+                'product_name': nameInput,
+                'description': descriptionInput,
+                'price': priceInput
+            },
+            dataType: 'json',
+            success: function (data) {
+              $("#product-"+idInput+"-name").html(nameInput);
+              $("#product-"+idInput+"-description").html(descriptionInput);
+              $("#product-"+idInput+"-price").html(priceInput);
+              }
+        });
           } else {
             alert("All fields must have a valid value.");
         }
@@ -112,6 +125,7 @@
 
   // Update Django Ajax Call
   function editProduct(id) {
+    $("input[name=id]").val(id)
     if (id) {
       $.ajax({
         method: "get",
