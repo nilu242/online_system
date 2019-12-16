@@ -1,0 +1,18 @@
+{% extends 'base.html'%}
+{%block content%}
+  <table class="table table-striped">
+    <tr>
+      <td>product name</td>
+      <td>Buying date</td>
+      <td>price</td>
+    </tr>
+    {% for product in buyed_products %}
+    <tr>
+      <td>{{ product.product }}</td>
+      <td>{{product.buying_date}}</td>
+      <td>{{product.price}}</td>
+    </tr>
+       <br>
+    {% endfor %}
+  </table>
+{% endblock%}

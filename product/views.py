@@ -13,28 +13,29 @@ from product.models import Product, Order
 import json
 
 
-class ProductDetailView(DetailView):
+class ProductDetail(DetailView):
     '''
     product detail class
     '''
     model = Product
     context_object_name = 'product'
 
-class ProductView(ListView):
+product_detail = ProductDetail.as_view()
+
+class ProductsList(ListView):
     '''
     product view list class
     '''
     model = Product
     success_url = '/charge'
 
-
     @method_decorator(verified_email_required)
     def dispatch(self, *args, **kwargs):
-        return super(ProductView, self).dispatch(*args, **kwargs)
+        return super(ProductsList, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
-        context = super(ProductView, self).get_context_data(**kwargs)
+        context = super(ProductsList, self).get_context_data(**kwargs)
         if self.request.user.role == 'admin':
             list_of_product = Product.objects.filter(user=self.request.user)
             context['list_of_product'] = list_of_product
@@ -45,6 +46,9 @@ class ProductView(ListView):
             context['key'] = settings.STRIPE_PUBLISHABLE_KEY
 
         return context
+
+product_list = ProductsList.as_view()
+
 
 class ProductCreate(CreateView):
     '''
@@ -65,6 +69,10 @@ class ProductCreate(CreateView):
         obj.save()
         return super(ProductCreate, self).form_valid(form)
 
+
+product_create = ProductCreate.as_view()
+
+
 class ProductDelete(View):
     """
     product delete class
@@ -77,6 +85,8 @@ class ProductDelete(View):
             'deleted': True
         }
         return JsonResponse(data)
+
+product_delete = ProductDelete.as_view()
 
 class UpdateProduct(UpdateView):
     """
@@ -100,13 +110,23 @@ class UpdateProduct(UpdateView):
         self.object = form.save()
         return JsonResponse({'data': 'success'})
 
+product_update = UpdateProduct.as_view()
 
 def purchased_view(request, pk):
     ''' purchased  '''
-    print('ok')
     order = Order()
     order.product = Product.objects.get(id=pk)
     order.user = request.user
     order.price = order.product.price
     order.save()
     return render(request, 'product/charge.html')
+
+
+class PurchasedHistory(ListView):
+    model = Order
+    context_object_name = 'buyed_products'
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
+
+product_order = PurchasedHistory.as_view()
