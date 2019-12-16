@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from product.models import Product, Orders
+from product.models import Product, Order
 from core.models import User
 
 class TestViews(TestCase):

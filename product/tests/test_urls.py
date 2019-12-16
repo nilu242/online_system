@@ -1,13 +1,13 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-from product.views import ProductView, ProductCreate, ProductDelete, purchased_view, UpdateProduct
+from product.views import ProductsList, ProductCreate, ProductDelete, purchased_view, UpdateProduct
 
 
 class TestUrls(SimpleTestCase):
 
     def test_product_list_url(self):
         url = '/'
-        self.assertEquals(resolve(url).func.view_class, ProductView)
+        self.assertEquals(resolve(url).func.view_class, ProductsList)
 
     def test_product_create_list_url(self):
         url = reverse('create')
@@ -22,5 +22,5 @@ class TestUrls(SimpleTestCase):
         self.assertEquals(resolve(url).func, purchased_view)
 
     def test_product_update_url(self):
-        url = reverse('update_product')
+        url = reverse('update_product', args=[2])
         self.assertEquals(resolve(url).func.view_class, UpdateProduct)
